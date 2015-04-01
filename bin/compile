@@ -45,24 +45,27 @@ for BUILDPACK in $(cat $1/.buildpacks); do
     # we'll get errors later if these are needed and don't exist
     chmod -f +x $dir/bin/{detect,compile,release} || true
 
-    framework=$($dir/bin/detect $1)
+    framework=$($dir/bin/detect $1) || true
 
-    if [ $? == 0 ]; then
+    if [ "$framework" != "no" ]; then
       echo "=====> Detected Framework: $framework"
-      $dir/bin/compile $1 $2 $3
+    else
+      echo "=====> Warning: framework detection failed. Continuing anyway."
+    fi
 
-      if [ $? != 0 ]; then
-        exit 1
-      fi
+    $dir/bin/compile $1 $2 $3
 
-      # check if the buildpack left behind an environment for subsequent ones
-      if [ -e $dir/export ]; then
-        source $dir/export
-      fi
+    if [ $? != 0 ]; then
+      exit 1
+    fi
 
-      if [ -x $dir/bin/release ]; then
-        $dir/bin/release $1 > $1/last_pack_release.out
-      fi
+    # check if the buildpack left behind an environment for subsequent ones
+    if [ -e $dir/export ]; then
+      source $dir/export
+    fi
+
+    if [ -x $dir/bin/release ]; then
+      $dir/bin/release $1 > $1/last_pack_release.out
     fi
   fi
 done
