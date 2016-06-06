@@ -1,14 +1,14 @@
-# heroku-buildpack-multi
+# heroku-buildpack-multiapp
 
-Use multiple buildpacks on your app
+Run multiple web applications in one container
 
 ## Usage
 
-    $ heroku config:add BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi.git
+    $ heroku config:add BUILDPACK_URL=https://github.com/Vincit/heroku-buildpack-multiapp.git
 
-    $ cat .buildpacks
-    https://github.com/heroku/heroku-buildpack-nodejs.git#0198c71daa8
-    https://github.com/heroku/heroku-buildpack-ruby.git#v86
+    $ cat .apps
+    frontend https://github.com/Vincit/heroku-buildpack-nodejs.git
+    backend https://github.com/Vincit/heroku-buildpack-java.git
 
 ## License
 

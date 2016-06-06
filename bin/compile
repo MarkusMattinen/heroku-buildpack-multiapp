@@ -12,7 +12,12 @@ function indent() {
 
 unset GIT_DIR
 
-for BUILDPACK in $(cat $1/.buildpacks); do
+cat $1/.apps | while read SUBDIR BUILDPACK; do
+  if [ -z "$SUBDIR" -o -z "$BUILDPACK" ]; then
+    echo "Invalid app configuration $SUBDIR $BUILDPACK. Expected a subdirectory and a buildpack URL separated by whitespace."
+    exit 1
+  fi
+
   dir=$(mktemp -t buildpackXXXXX)
   rm -rf $dir
 
@@ -24,7 +29,7 @@ for BUILDPACK in $(cat $1/.buildpacks); do
   fi
 
   if [ "$url" != "" ]; then
-    echo "=====> Downloading Buildpack: $url"
+    echo "=====> Downloading buildpack for $SUBDIR: $url"
 
     if [[ "$url" =~ \.tgz$ ]]; then
       mkdir -p "$dir"
@@ -45,7 +50,7 @@ for BUILDPACK in $(cat $1/.buildpacks); do
     # we'll get errors later if these are needed and don't exist
     chmod -f +x $dir/bin/{detect,compile,release} || true
 
-    framework=$($dir/bin/detect $1) || true
+    framework=$($dir/bin/detect $1/$SUBDIR) || true
 
     if [ "$framework" != "no" ]; then
       echo "=====> Detected Framework: $framework"
@@ -53,7 +58,7 @@ for BUILDPACK in $(cat $1/.buildpacks); do
       echo "=====> Warning: framework detection failed. Continuing anyway."
     fi
 
-    $dir/bin/compile $1 $2 $3
+    $dir/bin/compile $1/$SUBDIR $2 $3
 
     if [ $? != 0 ]; then
       exit 1
