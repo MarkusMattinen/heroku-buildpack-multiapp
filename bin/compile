@@ -18,6 +18,16 @@ cat $1/.apps | while read SUBDIR BUILDPACK; do
     exit 1
   fi
 
+  mkdir -p "$1/$SUBDIR"
+
+  if [ -d "$2" ]; then
+    mkdir -p "$2/$SUBDIR"
+  fi
+
+  if [ -d "$3" ]; then
+    mkdir -p "$3/$SUBDIR"
+  fi
+
   dir=$(mktemp -t buildpackXXXXX)
   rm -rf $dir
 
@@ -58,7 +68,7 @@ cat $1/.apps | while read SUBDIR BUILDPACK; do
       echo "=====> Warning: framework detection failed. Continuing anyway."
     fi
 
-    $dir/bin/compile $1/$SUBDIR $2 $3
+    $dir/bin/compile $1/$SUBDIR $2/$SUBDIR $3/$SUBDIR
 
     if [ $? != 0 ]; then
       exit 1
