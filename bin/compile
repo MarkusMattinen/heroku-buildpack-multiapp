@@ -68,13 +68,5 @@ cat $1/.apps | while read SUBDIR BUILDPACK; do
     if [ -e $dir/export ]; then
       source $dir/export
     fi
-
-    if [ -x $dir/bin/release ]; then
-      $dir/bin/release $1 > $1/last_pack_release.out
-    fi
   fi
 done
-
-if [ -e $1/last_pack_release.out ]; then
-  echo "Using release configuration from last framework ($framework)."
-fi
